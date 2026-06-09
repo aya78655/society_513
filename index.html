@@ -243,6 +243,7 @@ function showQuestion(){
   document.getElementById('q-text').textContent=q.text;
   hide('answer-area');
   const ia=document.getElementById('input-area');
+  ia.innerHTML='';
   if(q.type==='text'){
     ia.innerHTML=`<div class="note-box">記述問題です。自分で考えてから「答えを見る」を押してください。</div><button class="btn" onclick="showTextAnswer()">答えを見る</button>`;
   } else if(q.type==='multi'){
@@ -275,14 +276,14 @@ function submitMulti(){
   showAnswerBox(JSON.stringify(checked)===JSON.stringify([...q.answer].sort()),q);
 }
 function showTextAnswer(){
-  const q=currentQ;hide('input-area');show('answer-area');
+  const q=currentQ;document.getElementById('input-area').innerHTML='';show('answer-area');
   const ab=document.getElementById('answer-box');
   ab.className='answer-box neutral';
   ab.innerHTML=`<div class="mark">📝 模範解答</div><div class="correct-ans">${q.answer}</div><div class="exp">${q.explanation}</div>`;
   results.push({q,correct:null});
 }
 function showAnswerBox(isCorrect,q){
-  hide('input-area');show('answer-area');
+  document.getElementById('input-area').innerHTML='';show('answer-area');
   if(isCorrect)score++;
   const ab=document.getElementById('answer-box');
   ab.className='answer-box '+(isCorrect?'correct':'wrong');
