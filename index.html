@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>近畿地方 復習クイズ</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f0f8; --surface: #ffffff; --surface2: #ede8f2;
+    --border: rgba(0,0,0,0.09); --border2: rgba(0,0,0,0.16);
+    --text: #1a1820; --text2: #5a5068; --text3: #9a90a8;
+    --green-bg: #e6f2d6; --green-text: #2a5208; --green-border: #8cc44a;
+    --red-bg: #fceaea; --red-text: #7a2020; --red-border: #e89090;
+    --yellow-bg: #fef7e0; --yellow-text: #5c4200; --yellow-border: #e8c84a;
+    --accent: #5a2d8a; --accent2: #7a4daa;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 18px;
+  }
+  body {
+    font-family: 'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; padding: 1.5rem 1rem 3rem;
+    display: flex; align-items: flex-start; justify-content: center;
+  }
+  .container { width: 100%; max-width: 600px; }
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header .kamon { font-size: 40px; margin-bottom: 10px; display: block; }
+  .header .subtitle { font-size: 12px; letter-spacing: 0.12em; color: var(--text3); margin-bottom: 8px; }
+  .header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; color: var(--accent); }
+  .header .total { font-size: 14px; color: var(--text2); }
+  .section-wrap { margin-bottom: 1.5rem; }
+  .section-label { font-size: 13px; color: var(--text2); margin-bottom: 10px; font-weight: 500; }
+  .section-row { display: flex; gap: 7px; flex-wrap: wrap; }
+  .section-btn { padding: 7px 13px; font-size: 13px; font-family: inherit; background: var(--surface); border: 1px solid var(--border2); border-radius: 20px; cursor: pointer; color: var(--text2); transition: all 0.15s; font-weight: 500; }
+  .section-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .start-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+  .start-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px 14px; border-left: 3px solid var(--accent2); }
+  .start-item .label { font-size: 11px; color: var(--text3); margin-bottom: 3px; letter-spacing: 0.05em; }
+  .start-item .value { font-size: 14px; font-weight: 600; color: var(--accent); }
+  .progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+  .progress-label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .progress-bar-bg { flex: 1; height: 4px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s ease; }
+  .q-category { font-size: 11px; color: var(--text3); letter-spacing: 0.06em; margin-bottom: 8px; font-weight: 600; }
+  .q-text { font-size: 17px; line-height: 1.8; color: var(--text); white-space: pre-line; font-weight: 500; }
+  .input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .ans-input { flex: 1; padding: 13px 15px; font-size: 16px; font-family: inherit; border: 1.5px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); outline: none; transition: border-color 0.15s; }
+  .ans-input:focus { border-color: var(--accent); }
+  .ans-input:disabled { background: var(--surface2); }
+  .btn { display: block; width: 100%; padding: 14px; font-size: 15px; font-family: inherit; font-weight: 600; text-align: center; background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius-md); cursor: pointer; color: var(--text); transition: all 0.15s; }
+  .btn:hover { background: var(--surface2); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #441f6e; }
+  .btn-sm { padding: 11px 18px; font-size: 14px; width: auto; display: inline-block; }
+  .hint-toggle { padding: 8px 14px; font-size: 13px; font-family: inherit; background: var(--yellow-bg); border: 1px solid var(--yellow-border); border-radius: 20px; cursor: pointer; color: var(--yellow-text); margin-bottom: 10px; transition: background 0.15s; font-weight: 500; }
+  .hint-toggle:hover { background: #fdefc0; }
+  .hint-box { background: var(--yellow-bg); border: 1px solid var(--yellow-border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 10px; }
+  .hint-label { font-size: 11px; color: var(--yellow-text); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.05em; }
+  .hint-choices { display: flex; flex-wrap: wrap; gap: 6px; }
+  .hint-choice { padding: 5px 12px; background: var(--surface); border: 1px solid var(--yellow-border); border-radius: 20px; font-size: 13px; cursor: pointer; color: var(--yellow-text); transition: background 0.15s; font-weight: 500; }
+  .hint-choice:hover { background: #fdefc0; }
+  .answer-box { border-radius: var(--radius-sm); padding: 1rem 1.25rem; font-size: 15px; line-height: 1.7; margin-bottom: 10px; }
+  .answer-box.correct { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green-text); }
+  .answer-box.wrong { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red-text); }
+  .answer-box.neutral { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+  .answer-box .mark { font-weight: 700; margin-bottom: 6px; font-size: 16px; }
+  .answer-box .correct-ans { font-weight: 600; margin-bottom: 8px; }
+  .answer-box .exp { font-size: 13px; opacity: 0.85; white-space: pre-line; }
+  .multi-check-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .multi-check { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1.5px solid var(--border2); border-radius: 20px; font-size: 14px; cursor: pointer; background: var(--surface); font-weight: 500; transition: background 0.15s; }
+  .multi-check:hover { background: var(--surface2); }
+  .multi-check input { width: 15px; height: 15px; cursor: pointer; }
+  .note-box { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; color: var(--text2); margin-bottom: 10px; }
+  .result-score { font-size: 48px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 4px; text-align: center; color: var(--accent); }
+  .result-msg { font-size: 15px; color: var(--text2); text-align: center; margin-bottom: 1.5rem; }
+  .result-list { display: flex; flex-direction: column; margin-bottom: 1.5rem; }
+  .result-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .result-item .icon { font-weight: 700; min-width: 18px; font-size: 14px; }
+  .result-item .icon.ok { color: var(--green-text); }
+  .result-item .icon.ng { color: var(--red-text); }
+  .result-item .icon.memo { color: var(--text2); }
+  .result-item .detail { color: var(--text2); line-height: 1.5; }
+  .action-row { display: flex; gap: 8px; }
+  .action-row .btn { flex: 1; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <span class="kamon">⛩️</span>
+    <div class="subtitle">予習シリーズ 5年上 第13回</div>
+    <h1>近畿地方 復習クイズ</h1>
+    <p class="total">全 <span id="total-count"></span> 問</p>
+  </div>
+
+  <div id="start-screen">
+    <div class="card">
+      <div class="section-wrap">
+        <div class="section-label">出題範囲を選んでください（複数選択可）</div>
+        <div class="section-row">
+          <button class="section-btn active" data-section="1" onclick="toggleSection(this)">大問1 交通・観光</button>
+          <button class="section-btn active" data-section="2" onclick="toggleSection(this)">大問2 都市・産業</button>
+          <button class="section-btn active" data-section="3" onclick="toggleSection(this)">大問3 地図・地形</button>
+          <button class="section-btn active" data-section="4" onclick="toggleSection(this)">大問4 近畿の県</button>
+        </div>
+      </div>
+      <div class="start-info">
+        <div class="start-item"><div class="label">大問1</div><div class="value">交通・観光・世界遺産</div></div>
+        <div class="start-item"><div class="label">大問2</div><div class="value">都市・工業・伝統工芸</div></div>
+        <div class="start-item"><div class="label">大問3</div><div class="value">地図・川・半島・農業</div></div>
+        <div class="start-item"><div class="label">大問4</div><div class="value">近畿の県まとめ</div></div>
+      </div>
+      <button class="btn btn-primary" onclick="startQuiz()">クイズスタート →</button>
+    </div>
+  </div>
+
+  <div id="quiz-screen" class="hidden">
+    <div class="progress-wrap">
+      <div class="progress-label" id="q-label"></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog"></div></div>
+      <div class="progress-label" id="q-counter"></div>
+    </div>
+    <div class="card">
+      <div class="q-category" id="q-category"></div>
+      <div class="q-text" id="q-text"></div>
+    </div>
+    <div id="input-area"></div>
+    <div id="answer-area" class="hidden">
+      <div id="answer-box" class="answer-box"></div>
+      <button class="btn" onclick="nextQuestion()">次の問題へ →</button>
+    </div>
+  </div>
+
+  <div id="result-screen" class="hidden">
+    <div class="card">
+      <div class="result-score" id="result-score"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <div class="result-list" id="result-detail"></div>
+      <button class="btn btn-primary" id="retry-wrong-btn" style="margin-bottom:8px;" onclick="retryWrong()">まちがえた問題だけもう一度 →</button>
+      <div class="action-row">
+        <button class="btn" onclick="restartQuiz()">全問もう一度</button>
+        <button class="btn" onclick="goHome()">トップへ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const allQuestions = [
+
+  // ===== 大問1 交通・観光 =====
+  { section:1, category:"大問1・問1", text:"東海道新幹線の下りの終点が起点となっている新幹線の名は？（○○新幹線）", type:"free", hints:["山陽新幹線","九州新幹線","東北新幹線","北陸新幹線"], answer:"山陽新幹線", explanation:"山陽新幹線（さんようしんかんせん）が正解。新大阪駅から博多駅を結びます。" },
+  { section:1, category:"大問1・問2", text:"日本で初めての本格的な高速道路として1965年に全線開通した高速道路は？", type:"free", hints:["名神高速道路","東名高速道路","中央自動車道","中国自動車道"], answer:"名神高速道路", explanation:"名神高速道路（めいしんこうそくどうろ）が正解。愛知県〜兵庫県を結ぶ日本初の本格高速道路です。" },
+  { section:1, category:"大問1・問3", text:"四国から近畿へ自動車で行くとき、淡路島を経由して渡る橋を通る順は？", type:"free", hints:["大鳴門橋→明石海峡大橋","明石海峡大橋→大鳴門橋","瀬戸大橋→明石海峡大橋","大鳴門橋→瀬戸大橋"], answer:"大鳴門橋→明石海峡大橋", altAnswers:["ア"], explanation:"四国から淡路島へ大鳴門橋で渡り、淡路島から本州（神戸）へ明石海峡大橋で渡ります。" },
+  { section:1, category:"大問1・問4", text:"神戸港の人工島「□アイランド」は□山地の土を削ってつくられました。□は？", type:"free", hints:["六甲","比叡","生駒","金剛"], answer:"六甲", explanation:"六甲（ろっこう）が正解。六甲山地の土を削り、ポートアイランド・六甲アイランドがつくられました。" },
+  { section:1, category:"大問1・問5", text:"大阪湾の海上にある、24時間離着陸できる空港は？", type:"free", hints:["関西国際空港","大阪国際空港","伊丹空港","神戸空港"], answer:"関西国際空港", explanation:"関西国際空港（かんさいこくさいくうこう）が正解。海上空港のため騒音の心配がなく24時間対応です。" },
+  { section:1, category:"大問1・問6", text:"「近畿」ということばは「□の近く」という意味です。□をひらがな3字で答えなさい。", type:"free", hints:["みやこ","おおさか","きょうと","なにわ"], answer:"みやこ", explanation:"「みやこ（都）」が正解。近畿＝都の近く、という意味です。" },
+  { section:1, category:"大問1・問7C", text:"奈良県にある世界文化遺産で、世界最古の木造建築があることで知られる建築物は？", type:"free", hints:["法隆寺","東大寺","春日大社","唐招提寺"], answer:"法隆寺", explanation:"法隆寺（ほうりゅうじ）が正解。607年に建てられた世界最古の木造建築があります。" },
+  { section:1, category:"大問1・問7D", text:"京都府宇治市にある、10円玉の絵柄としても知られる世界文化遺産は？", type:"free", hints:["平等院鳳凰堂","金閣寺","清水寺","伏見稲荷大社"], answer:"平等院鳳凰堂", explanation:"平等院鳳凰堂（びょうどういんほうおうどう）が正解。宇治市にある世界文化遺産です。" },
+  { section:1, category:"大問1・問8", text:"兵庫県にある「白鷺城」ともよばれる世界文化遺産の城は？（○○城）", type:"free", hints:["姫路城","大阪城","彦根城","松本城"], answer:"姫路城", explanation:"姫路城（ひめじじょう）が正解。兵庫県姫路市にある世界文化遺産で、白鷺城ともよばれます。" },
+  { section:1, category:"大問1・問9-1", text:"京都でつくられている伝統的工芸品ではないものはどれ？\nア：京友禅　イ：西陣織　ウ：大島つむぎ　エ：丹後ちりめん", type:"free", hints:["ウ（大島つむぎ）","ア（京友禅）","イ（西陣織）","エ（丹後ちりめん）"], answer:"ウ（大島つむぎ）", altAnswers:["ウ","大島つむぎ"], explanation:"大島つむぎは鹿児島県の奄美大島でつくられる伝統的工芸品です。京都の伝統工芸ではありません。" },
+  { section:1, category:"大問1・問9-2", text:"京都市で毎年7月に行われる、1000年以上の歴史がある祭りの名は？（ひらがな3字）", type:"free", hints:["ぎおん","あおい","じだい","やすらい"], answer:"ぎおん", altAnswers:["ぎおん祭","祇園祭"], explanation:"祇園祭（ぎおんまつり）が正解。山鉾巡行で有名な京都最大の祭りです。" },
+  { section:1, category:"大問1・問10", text:"信楽焼（たぬきの置物でも有名）がつくられている府県は？", type:"free", hints:["滋賀県","京都府","奈良県","三重県"], answer:"滋賀県", explanation:"滋賀県（甲賀市信楽町）が正解。" },
+  { section:1, category:"大問1・問11", text:"伊勢神宮があるのはどの府県？", type:"free", hints:["三重県","奈良県","和歌山県","滋賀県"], answer:"三重県", explanation:"三重県（みえけん）が正解。伊勢市に位置する、日本で最も重要な神社のひとつです。" },
+
+  // ===== 大問2 都市・工業・伝統工芸 =====
+  { section:2, category:"大問2・問1A", text:"近畿地方にある政令指定都市は4つ。大阪市・京都市・神戸市ともう1つは？（大阪府の都市）", type:"free", hints:["堺市","東大阪市","豊中市","吹田市"], answer:"堺市", explanation:"堺市（さかいし）が正解。大阪府に位置する政令指定都市で工業がさかんです。" },
+  { section:2, category:"大問2・問1B", text:"神戸港の人工島「□アイランド」の□をカタカナで答えなさい。（六甲山地の土でつくられた）", type:"free", hints:["ポート","六甲","メリケン","ハーバー"], answer:"ポート", altAnswers:["ポートアイランド"], explanation:"ポートアイランドが正解。神戸港に浮かぶ人工島で、六甲山地の土を埋め立ててつくられました。" },
+  { section:2, category:"大問2・問2-1", text:"大阪市を流れる、琵琶湖から流れ出てくる川は大阪府では何とよばれますか？", type:"free", hints:["淀川","宇治川","瀬田川","大和川"], answer:"淀川", explanation:"淀川（よどがわ）が正解。滋賀県→瀬田川、京都府→宇治川、大阪府→淀川と名前が変わります。" },
+  { section:2, category:"大問2・問2-2", text:"2025年に大阪府の夢洲（ゆめしま）で開催された国際的なイベントは？（○○博覧会）", type:"free", hints:["万国博覧会","花博覧会","海洋博覧会","緑の博覧会"], answer:"万国博覧会", altAnswers:["万博","大阪万博"], explanation:"万国博覧会（ばんこくはくらんかい）が正解。2025年大阪・関西万博として開催されました。" },
+  { section:2, category:"大問2・問2-3", text:"大都市周辺に高度経済成長期につくられた大規模な住宅地を何という？（○○タウン）", type:"free", hints:["ニュータウン","ベッドタウン","ガーデンタウン","サテライトタウン"], answer:"ニュータウン", explanation:"ニュータウンが正解。豊中市・吹田市の千里ニュータウンなどが有名です。ただし現在は住民の高齢化が進んでいます。" },
+  { section:2, category:"大問2・問3-1", text:"京都市で毎年7月に行われる祭りは？", type:"free", hints:["祇園祭","葵祭","時代祭","なにわ祭"], answer:"祇園祭", explanation:"祇園祭（ぎおんまつり）が正解。1000年以上の歴史を持つ京都最大の祭りです。" },
+  { section:2, category:"大問2・問3-2", text:"宇治市にある、10円玉の絵柄で知られる世界文化遺産の建築物は？", type:"free", hints:["平等院鳳凰堂","金閣寺","銀閣寺","東寺"], answer:"平等院鳳凰堂", explanation:"平等院鳳凰堂（びょうどういんほうおうどう）が正解。" },
+  { section:2, category:"大問2・問3-3", text:"大津市を県庁所在地とする県の名は？", type:"free", hints:["滋賀県","京都府","奈良県","三重県"], answer:"滋賀県", explanation:"滋賀県（しがけん）が正解。大津市と京都市は鉄道で約10分という近さです。" },
+  { section:2, category:"大問2・問4", text:"神戸市がある兵庫県に世界文化遺産に登録されている城は？", type:"free", hints:["姫路城","大阪城","二条城","彦根城"], answer:"姫路城", explanation:"姫路城（ひめじじょう）が正解。" },
+  { section:2, category:"大問2・問5", text:"京都市の道が今も碁盤の目のようになっているのはなぜ？（20字以内）", type:"text", answer:"昔、都がおかれたときに計画的につくられたまちだから。", explanation:"京都は794年に平安京として計画的につくられたため、碁盤の目状の道路が今も残っています。" },
+  { section:2, category:"大問2・問6", text:"清水寺に向かう坂道の周辺でつくられてきた、京都を代表する焼き物は？", type:"free", hints:["清水焼","有田焼","九谷焼","信楽焼"], answer:"清水焼", explanation:"清水焼（きよみずやき）が正解。清水坂の周辺で作られてきたことが名前の由来です。" },
+  { section:2, category:"大問2・問7", text:"大阪湾に面する関西国際空港がある工業地帯は？（○○工業地帯）", type:"free", hints:["阪神工業地帯","中京工業地帯","京浜工業地帯","北九州工業地域"], answer:"阪神工業地帯", explanation:"阪神工業地帯（はんしんこうぎょうちたい）が正解。大阪湾沿岸に広がります。" },
+  { section:2, category:"大問2・問8-1", text:"阪神工業地帯について正しいものはどれ？\nI：第二次世界大戦前には生産額が日本一だった\nII：工業生産額では金属工業が機械工業を上回ることが多い", type:"free", hints:["I正・II誤（イ）","I正・II正（ア）","I誤・II正（ウ）","I誤・II誤（エ）"], answer:"I正・II誤（イ）", altAnswers:["イ","I正・II誤"], explanation:"I→正：戦前は阪神工業地帯が全国1位でした。\nII→誤：現在は機械工業の方が金属工業より多い。" },
+  { section:2, category:"大問2・問8-2", text:"和歌山市では何の工業がさかんですか？", type:"free", hints:["鉄鋼業","造船業","石油化学","繊維工業"], answer:"鉄鋼業", explanation:"鉄鋼業（てっこうぎょう）が正解。和歌山市は阪神工業地帯の一部として鉄鋼業が発達しています。" },
+
+  // ===== 大問3 地図・川・半島・農業 =====
+  { section:3, category:"大問3・問1", text:"近畿地方の日本三景のひとつで、京都府北部の丹後半島の付け根にある景勝地は？", type:"free", hints:["天橋立","松島","宮島","和歌の浦"], answer:"天橋立", explanation:"天橋立（あまのはしだて）が正解。日本三景は天橋立・松島・宮島です。" },
+  { section:3, category:"大問3・問2-1", text:"琵琶湖の面積は、琵琶湖がある県の面積の約何分の1をしめていますか？", type:"free", hints:["約6分の1","約2分の1","約10分の1","約3分の1"], answer:"約6分の1", explanation:"約6分の1が正解。滋賀県の面積の約1/6が琵琶湖です。" },
+  { section:3, category:"大問3・問2-2", text:"琵琶湖から流れ出て大阪湾に注ぐ川は、大阪府では何とよばれますか？", type:"free", hints:["淀川","宇治川","瀬田川","大和川"], answer:"淀川", explanation:"淀川（よどがわ）が正解。滋賀→瀬田川、京都→宇治川、大阪→淀川と名前が変わります。" },
+  { section:3, category:"大問3・問3", text:"三重県の県庁所在地で、鈴鹿山脈の東に位置する都市は？（○○市）", type:"free", hints:["津市","四日市市","伊勢市","鈴鹿市"], answer:"津市", explanation:"津市（つし）が正解。三重県の県庁所在地で、全国で最も短い市名のひとつです。" },
+  { section:3, category:"大問3・問4", text:"熊野川（新宮川）に近い和歌山県の都市で、木材の製材業で発達した都市は？", type:"free", hints:["新宮市","和歌山市","田辺市","尾鷲市"], answer:"新宮市", explanation:"新宮市（しんぐうし）が正解。熊野川の別名「新宮川」の名の由来となった都市です。" },
+  { section:3, category:"大問3・問5", text:"本州最南端の岬の名前は？（○○岬）", type:"free", hints:["潮岬","室戸岬","足摺岬","大王崎"], answer:"潮岬", explanation:"潮岬（しおのみさき）が正解。和歌山県串本町にある本州最南端の岬です。" },
+  { section:3, category:"大問3・問6-1", text:"紀の川（上流では吉野川とよばれる）の流域で育てられる、高品質な木材は？（○○すぎ）", type:"free", hints:["吉野すぎ","秋田すぎ","天竜すぎ","北山すぎ"], answer:"吉野すぎ", explanation:"吉野すぎ（よしのすぎ）が正解。奈良県の吉野地方で育てられる、質の高いスギです。" },
+  { section:3, category:"大問3・問6-2", text:"和歌山県の生産量が全国の半分以上をしめるくだものは？", type:"free", hints:["うめ","みかん","レモン","もも"], answer:"うめ", explanation:"うめが正解。和歌山県は梅の生産量が全国1位で、全国の約60%を占めます。" },
+  { section:3, category:"大問3・問6-3", text:"和歌山県の生産量が全国1位のくだものをもう1つ答えなさい。（みかんの近畿版）", type:"free", hints:["みかん","かき","いちご","なし"], answer:"みかん", explanation:"みかんも正解のひとつです。和歌山県はみかんの生産量が全国上位で、有田みかんが特に有名です。" },
+  { section:3, category:"大問3・問7", text:"日本で最も大きな半島で、三重県・奈良県・和歌山県にまたがる半島は？（○○半島）", type:"free", hints:["紀伊半島","伊豆半島","渥美半島","能登半島"], answer:"紀伊半島", explanation:"紀伊半島（きいはんとう）が正解。日本最大の半島です。" },
+  { section:3, category:"大問3・問8", text:"三重県の志摩半島・英虞湾で世界で初めて養殖に成功した水産物は？", type:"free", hints:["真珠","かき","あわび","のり"], answer:"真珠", explanation:"真珠（しんじゅ）が正解。御木本幸吉が志摩半島の英虞湾で世界初の真珠養殖に成功しました。" },
+  { section:3, category:"大問3・問9", text:"淡路島でさかんに栽培され、兵庫県の生産量が全国第2位の農作物（2023年）は？", type:"free", hints:["たまねぎ","キャベツ","ピーマン","だいこん"], answer:"たまねぎ", explanation:"たまねぎが正解。淡路島は温暖な気候を活かしたたまねぎの産地として有名です。" },
+  { section:3, category:"大問3・問10", text:"淡路島でつくられた農作物をトラックで本州へ運ぶとき通る橋は？", type:"free", hints:["明石海峡大橋","瀬戸大橋","大鳴門橋","関門橋"], answer:"明石海峡大橋", explanation:"明石海峡大橋（あかしかいきょうおおはし）が正解。淡路島と兵庫県（神戸市）を結ぶ世界最長クラスの吊り橋です。" },
+
+  // ===== 大問4 近畿の県まとめ =====
+  { section:4, category:"大問4・問1", text:"近畿地方の北部・丹後半島がある府県は？", type:"free", hints:["京都府","兵庫県","滋賀県","大阪府"], answer:"京都府", explanation:"京都府が正解。日本三景のひとつ天橋立も京都府北部（丹後半島）にあります。" },
+  { section:4, category:"大問4・問2", text:"琵琶湖がある県の名は？また、琵琶湖から流れ出る川（その県では何とよばれる？）", type:"free", hints:["滋賀県・瀬田川","京都府・宇治川","大阪府・淀川","奈良県・大和川"], answer:"滋賀県・瀬田川", altAnswers:["滋賀県と瀬田川","瀬田川・滋賀県"], explanation:"滋賀県・瀬田川が正解。琵琶湖から流れ出るただ1つの川は滋賀県では瀬田川とよばれます。" },
+  { section:4, category:"大問4・問3", text:"奈良県にある世界文化遺産を2つ答えなさい。", type:"free", hints:["法隆寺と東大寺（など奈良の世界遺産）","姫路城と法隆寺","東大寺と清水寺","春日大社と厳島神社"], answer:"法隆寺と東大寺（など）", altAnswers:["法隆寺","東大寺","春日大社","元興寺","薬師寺"], explanation:"奈良の世界遺産（古都奈良の文化財）には東大寺・薬師寺・春日大社などが含まれます。また法隆寺地域の仏教建造物も別の世界遺産として登録されています。" },
+  { section:4, category:"大問4・問4", text:"三重県の伊勢神宮は世界文化遺産ですか？それとも違いますか？", type:"free", hints:["世界文化遺産ではない","世界文化遺産である","世界自然遺産である","ユネスコ無形文化遺産"], answer:"世界文化遺産ではない", altAnswers:["違う","世界遺産でない","ではない"], explanation:"伊勢神宮は世界文化遺産には登録されていません。ただし日本最重要の神社として多くの参拝者が訪れます。" },
+  { section:4, category:"大問4・問5", text:"和歌山県のくだもの生産について正しいものを2つ選びなさい。\nア：うめの生産量が全国1位\nイ：みかんの生産量が全国1位\nウ：レモンの生産量が全国1位\nエ：かきの生産量が全国1位", type:"multi", hints:["ア","イ","ウ","エ"], hintDetails:["ア：和歌山県は梅の生産量全国1位（全国の約60%）","イ：和歌山県はみかんも全国上位（有田みかんが有名）","ウ：レモンの生産量1位は広島県","エ：かきの生産量1位は広島県"], answer:["ア","イ"], explanation:"アとイが正しい。和歌山県はうめ・みかんの生産量が全国上位です。" },
+  { section:4, category:"大問4・問6", text:"兵庫県にある、本州と四国を結ぶ橋は？（神戸〜淡路島〜鳴門ルート）", type:"free", hints:["明石海峡大橋と大鳴門橋","瀬戸大橋","しまなみ海道","関門橋"], answer:"明石海峡大橋と大鳴門橋", altAnswers:["明石海峡大橋","大鳴門橋と明石海峡大橋"], explanation:"神戸〜鳴門ルートでは、明石海峡大橋（神戸〜淡路島）と大鳴門橋（淡路島〜鳴門）を通ります。" },
+  { section:4, category:"大問4・問7", text:"大阪府に位置する政令指定都市を2つ答えなさい。", type:"free", hints:["大阪市と堺市","大阪市と東大阪市","堺市と豊中市","大阪市と尼崎市"], answer:"大阪市と堺市", altAnswers:["堺市と大阪市"], explanation:"大阪市と堺市が正解。大阪府には2つの政令指定都市があります。" },
+  { section:4, category:"大問4・問8", text:"大阪市について正しいものはどれ？\nI：東京・横浜市に次いで日本で3番目に人口が多い\nII：淀川の三角州の上に発達した都市", type:"free", hints:["I正・II正（ア）","I正・II誤（イ）","I誤・II正（ウ）","I誤・II誤（エ）"], answer:"I正・II正（ア）", altAnswers:["ア","I正・II正"], explanation:"I・IIともに正しい。大阪市は日本3番目の人口規模で、淀川のデルタ地帯に発展しました。" },
+  { section:4, category:"大問4・問9", text:"近畿地方で世界自然遺産に登録されている地域は？（○○○の霊場とその参詣道）", type:"free", hints:["紀伊山地","吉野山","熊野古道","高野山"], answer:"紀伊山地", altAnswers:["紀伊山地の霊場と参詣道","紀伊山地の霊場"], explanation:"「紀伊山地の霊場と参詣道」が正解。三重・奈良・和歌山にまたがる世界遺産です。" },
+  { section:4, category:"大問4・問10", text:"京都市について正しいものはどれ？\nア：中国地方でただ1つの政令指定都市\nイ：太田川の三角州の上に発達\nウ：古い都がおかれ、碁盤の目状の道路が残る\nエ：原爆ドームがある", type:"free", hints:["ウ（碁盤の目状の道路）","ア（中国地方の政令指定都市）","イ（太田川）","エ（原爆ドーム）"], answer:"ウ（碁盤の目状の道路）", altAnswers:["ウ"], explanation:"ウが正解。ア・イ・エはすべて広島市の説明です。京都市は794年に平安京として計画的につくられたため、碁盤の目状の道路が今も残っています。" },
+  { section:4, category:"大問4・問11", text:"近畿地方の府県のうち、海に面していない内陸の府県を2つ答えなさい。", type:"free", hints:["奈良県と滋賀県","奈良県と京都府","大阪府と奈良県","滋賀県と京都府"], answer:"奈良県と滋賀県", altAnswers:["滋賀県と奈良県"], explanation:"奈良県と滋賀県が正解。近畿地方の2府5県のうち、この2県だけが海に面していない内陸県です。" },
+  { section:4, category:"大問4・問12", text:"近畿地方の地熱発電・温泉で知られる三重県の半島は？（○○半島）", type:"free", hints:["志摩半島","紀伊半島","伊豆半島","渥美半島"], answer:"志摩半島", explanation:"志摩半島（しまはんとう）が正解。英虞湾での真珠養殖でも有名です。" }
+
+];
+
+let currentIndex=0, score=0, results=[], shuffled=[];
+let activeSections = new Set([1,2,3,4]);
+let hintShown=false, currentQ=null;
+
+function toggleSection(btn) {
+  const s=parseInt(btn.dataset.section);
+  if(activeSections.has(s)){if(activeSections.size===1)return;activeSections.delete(s);btn.classList.remove('active');}
+  else{activeSections.add(s);btn.classList.add('active');}
+  document.getElementById('total-count').textContent=allQuestions.filter(q=>activeSections.has(q.section)).length;
+}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function show(id){document.getElementById(id).classList.remove('hidden');}
+function hide(id){document.getElementById(id).classList.add('hidden');}
+
+function startQuiz(){
+  shuffled=shuffle(allQuestions.filter(q=>activeSections.has(q.section)));
+  currentIndex=0;score=0;results=[];
+  hide('start-screen');show('quiz-screen');showQuestion();
+}
+
+function showQuestion(){
+  currentQ=shuffled[currentIndex];
+  const q=currentQ,total=shuffled.length;
+  hintShown=false;
+  document.getElementById('q-label').textContent=q.category;
+  document.getElementById('q-counter').textContent=(currentIndex+1)+' / '+total;
+  document.getElementById('prog').style.width=(currentIndex/total*100)+'%';
+  document.getElementById('q-category').textContent=q.category;
+  document.getElementById('q-text').textContent=q.text;
+  hide('answer-area');
+  const ia=document.getElementById('input-area');
+  if(q.type==='text'){
+    ia.innerHTML=`<div class="note-box">記述問題です。自分で考えてから「答えを見る」を押してください。</div><button class="btn" onclick="showTextAnswer()">答えを見る</button>`;
+  } else if(q.type==='multi'){
+    const keys=['ア','イ','ウ','エ'];
+    const checks=q.choices.map((c,i)=>`<label class="multi-check"><input type="checkbox" value="${keys[i]}"> ${keys[i]}</label>`).join('');
+    const hintRows=q.hintDetails?q.hintDetails.map(d=>`<div style="margin-bottom:4px;">・${d}</div>`).join(''):'';
+    ia.innerHTML=`<div class="note-box">正しいものをすべて選んでください</div><div class="multi-check-row">${checks}</div><button class="hint-toggle" onclick="toggleHint(this)">💡 ヒント（各選択肢の内容）を見る</button><div id="hint-box" class="hint-box hidden"><div class="hint-label">ヒント</div><div style="font-size:14px;line-height:1.8;color:var(--yellow-text);">${hintRows}</div></div><button class="btn btn-primary" style="margin-top:10px;" onclick="submitMulti()">答える</button>`;
+  } else {
+    const hintBtns=q.hints.map(h=>`<span class="hint-choice" onclick="fillHint('${h}')">${h}</span>`).join('');
+    ia.innerHTML=`<div class="input-row"><input class="ans-input" id="ans-input" type="text" placeholder="ここに答えを入力…" autocomplete="off" onkeydown="if(event.key==='Enter')submitAnswer()"/><button class="btn btn-primary btn-sm" onclick="submitAnswer()">答える</button></div><button class="hint-toggle" onclick="toggleHint(this)">💡 ヒント（選択肢）を見る</button><div id="hint-box" class="hint-box hidden"><div class="hint-label">ヒント：選択肢</div><div class="hint-choices">${hintBtns}</div></div>`;
+    setTimeout(()=>{const el=document.getElementById('ans-input');if(el)el.focus();},100);
+  }
+}
+
+function toggleHint(btn){const box=document.getElementById('hint-box');if(!box)return;box.classList.toggle('hidden');hintShown=true;}
+function fillHint(val){const input=document.getElementById('ans-input');if(input){input.value=val;input.focus();}}
+function normalize(str){return str.trim().replace(/\s+/g,'').replace(/[　]/g,'').toLowerCase().replace(/[ａ-ｚＡ-Ｚ０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));}
+function checkAnswer(user,q){const u=normalize(user);if(u===normalize(q.answer))return true;if(q.altAnswers)for(const alt of q.altAnswers)if(u===normalize(alt))return true;return false;}
+
+function submitAnswer(){
+  const q=currentQ,input=document.getElementById('ans-input');
+  if(!input||!input.value.trim())return;
+  input.disabled=true;
+  showAnswerBox(checkAnswer(input.value.trim(),q),q);
+}
+function submitMulti(){
+  const q=currentQ;
+  const checked=[...document.querySelectorAll('.multi-check input:checked')].map(el=>el.value).sort();
+  document.querySelectorAll('.multi-check input').forEach(el=>el.disabled=true);
+  showAnswerBox(JSON.stringify(checked)===JSON.stringify([...q.answer].sort()),q);
+}
+function showTextAnswer(){
+  const q=currentQ;hide('input-area');show('answer-area');
+  const ab=document.getElementById('answer-box');
+  ab.className='answer-box neutral';
+  ab.innerHTML=`<div class="mark">📝 模範解答</div><div class="correct-ans">${q.answer}</div><div class="exp">${q.explanation}</div>`;
+  results.push({q,correct:null});
+}
+function showAnswerBox(isCorrect,q){
+  hide('input-area');show('answer-area');
+  if(isCorrect)score++;
+  const ab=document.getElementById('answer-box');
+  ab.className='answer-box '+(isCorrect?'correct':'wrong');
+  const ansText=Array.isArray(q.answer)?q.answer.join('・'):q.answer;
+  const hintNote=hintShown&&isCorrect?'<div style="font-size:12px;margin-top:4px;opacity:0.7;">（ヒントあり）</div>':'';
+  ab.innerHTML=`<div class="mark">${isCorrect?'◯ 正解！':'✕ 不正解'}</div>${hintNote}<div class="correct-ans">正解：${ansText}</div><div class="exp">${q.explanation}</div>`;
+  results.push({q,correct:isCorrect});
+}
+function nextQuestion(){currentIndex++;if(currentIndex>=shuffled.length)showResult();else showQuestion();}
+function showResult(){
+  hide('quiz-screen');show('result-screen');
+  document.getElementById('retry-wrong-btn').style.display='block';
+  const judged=results.filter(r=>r.correct!==null);
+  const sc=judged.filter(r=>r.correct).length;
+  document.getElementById('result-score').textContent=sc+' / '+judged.length+' 問正解';
+  const pct=judged.length>0?Math.round(sc/judged.length*100):0;
+  document.getElementById('result-msg').textContent=pct>=80?'🎉 すばらしい！よく復習できています':pct>=60?'もう少し！もう一度チャレンジしよう':'もう一度しっかり復習しよう！';
+  const wrongCount=results.filter(r=>r.correct===false).length;
+  const rb=document.getElementById('retry-wrong-btn');
+  if(wrongCount===0)rb.style.display='none';
+  else rb.textContent=`まちがえた ${wrongCount} 問だけもう一度 →`;
+  document.getElementById('result-detail').innerHTML=results.map(r=>{
+    const icon=r.correct===null?'📝':r.correct?'◯':'✕';
+    const cls=r.correct===null?'memo':r.correct?'ok':'ng';
+    return `<div class="result-item"><span class="icon ${cls}">${icon}</span><span class="detail">${r.q.category}：${r.q.text.slice(0,28)}…</span></div>`;
+  }).join('');
+}
+function retryWrong(){
+  const wrong=results.filter(r=>r.correct===false).map(r=>r.q);
+  if(!wrong.length)return;
+  shuffled=shuffle(wrong);currentIndex=0;score=0;results=[];
+  hide('result-screen');show('quiz-screen');showQuestion();
+}
+function restartQuiz(){hide('result-screen');startQuiz();}
+function goHome(){hide('result-screen');show('start-screen');}
+
+document.getElementById('total-count').textContent=allQuestions.length;
+</script>
+</body>
+</html>
